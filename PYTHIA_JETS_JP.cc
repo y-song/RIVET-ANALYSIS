@@ -81,8 +81,8 @@ namespace Rivet
 	     }
       }
 
-      mytxtfile.open("pythia_20_pthat_20_pt_jets_jp_matched_new_ne_smearing.txt");
-      mytxtfile_long.open("pythia_20_pthat_20_pt_jets_jp_new_ne_smearing.txt");
+      mytxtfile.open("pythia_20_pthat_20_pt_jets_full_matched_no_hadronization.txt");
+      mytxtfile_long.open("pythia_20_pthat_20_pt_jets_full_no_hadronization.txt");
       
       for (int i = 0; i <= Nbounds_JP_eta; ++i){
 	      double etax = -1 * etaMax + i * (double)2 * etaMax / Nbounds_JP_eta;
@@ -117,7 +117,7 @@ namespace Rivet
 	      xgrid.clear();
       }
 
-      vector<double> k{0.3, 0.5, 1, 2};
+      vector<double> k{0.3, 0.5, 1, 2, 2.5};
       double xsecweight = handler().nominalCrossSection();
 
       // Get the final state particles and start clustering jets
@@ -155,7 +155,7 @@ namespace Rivet
         }
         else
         {
-	  //parts_ch.push_back(pseudojet);	
+	  parts_ch.push_back(pseudojet);	
           uniform_real_distribution<double> dropCharge(0.0, 1.0);
           double keep = dropCharge(generator);
 	  double eff;
@@ -178,7 +178,7 @@ namespace Rivet
 	  pj_smeared.reset_momentum(pj_smeared.px(), pj_smeared.py(), pj_smeared.pz(), sqrt(pow(pj_smeared.px(),2)+pow(pj_smeared.py(),2)+pow(pj_smeared.pz(),2)+pow(0.1395704,2))); // charged pion mass
 	  if (pj_smeared.perp() < 0.2 || pj_smeared.perp() > 30.)	continue;
 	  pj_smeared.set_user_info(new fastjet::ParticleInfo(charge,pid));
-          //parts_s_ch.push_back(pj_smeared);
+          parts_s_ch.push_back(pj_smeared);
 	  parts_s.push_back(pj_smeared);
         }
       }
@@ -231,6 +231,43 @@ namespace Rivet
       vector<fastjet::PseudoJet> jets_s = sorted_by_pt(selector(cs_s.inclusive_jets()));
       vector<fastjet::PseudoJet> sdjets_s = sd(jets_s);
 
+      // Calculate UE number of particles and avg pT
+      vector<double> trans_pt{};
+      vector<double> trans_s_pt{};
+      vector<double> trans_05_pt{};
+      vector<double> trans_s_05_pt{};
+      double trans_ptavg = 0;
+      double trans_s_ptavg = 0;
+      double trans_05_ptavg = 0;
+      double trans_s_05_ptavg = 0;
+
+      if (parts_ch.size() != 0 && jets.size() != 0) {
+	for (PseudoJet &part_ch : parts_ch)
+      	{
+		if (abs(jets[0].delta_phi_to(part_ch)) < pi/3 || abs(jets[0].delta_phi_to(part_ch)) > 2*pi/3)	continue;
+        	trans_pt.push_back(part_ch.perp());
+		if (part_ch.perp() > 0.5){
+			trans_05_pt.push_back(part_ch.perp());
+		}
+      	}
+      }
+
+      if (parts_s_ch.size() != 0 && jets_s.size() != 0) {
+	for (PseudoJet &part_s_ch : parts_s_ch)
+      	{
+		if (abs(jets_s[0].delta_phi_to(part_s_ch)) < pi/3 || abs(jets_s[0].delta_phi_to(part_s_ch)) > 2*pi/3)	continue;
+        	trans_s_pt.push_back(part_s_ch.perp());
+		if (part_s_ch.perp() > 0.5){
+			trans_s_05_pt.push_back(part_s_ch.perp());
+		}
+      	}
+      }
+
+     if (trans_pt.size() != 0)	trans_ptavg = accumulate(trans_pt.begin(), trans_pt.end(), 0.0) / trans_pt.size();
+     if (trans_s_pt.size() != 0)	trans_s_ptavg = accumulate(trans_s_pt.begin(), trans_s_pt.end(), 0.0) / trans_s_pt.size();
+     if (trans_05_pt.size() != 0)	trans_05_ptavg = accumulate(trans_05_pt.begin(), trans_05_pt.end(), 0.0) / trans_05_pt.size();
+     if (trans_s_05_pt.size() != 0)	trans_s_05_ptavg = accumulate(trans_s_05_pt.begin(), trans_s_05_pt.end(), 0.0) / trans_s_05_pt.size();
+
       // Calculate jet charge 
       for (unsigned int i = 0; i < jets.size(); i++)
       {
@@ -246,15 +283,6 @@ namespace Rivet
        		}
        		q.push_back( numerator / pow(jets[i].perp(), kappa) );
 
-		numerator = 0;
-        	for (unsigned int j = 0; j < jets[i].constituents().size(); j++)
-        	{
-         	 PseudoJet part = jets[i].constituents().at(j);
-         	 if (part.perp() < 2.)	continue;
-		 double charge = part.user_info<fastjet::ParticleInfo>().charge();
-         	 numerator += pow(part.perp(), kappa) * charge;
-       		}
-       		q.push_back( numerator / pow(jets[i].perp(), kappa) );
 	}
 	jets[i].set_user_info(new fastjet::MyUserInfo(q, -1, -999));
       }
@@ -274,15 +302,6 @@ namespace Rivet
        		}
        		q.push_back( numerator / pow(jets_s[i].perp(), kappa) );
 
-		numerator = 0;
-        	for (unsigned int j = 0; j < jets_s[i].constituents().size(); j++)
-        	{
-         	 PseudoJet part = jets_s[i].constituents().at(j);
-         	 if (part.perp() < 2.)	continue;
-		 double charge = part.user_info<fastjet::ParticleInfo>().charge();
-         	 numerator += pow(part.perp(), kappa) * charge;
-       		}
-       		q.push_back( numerator / pow(jets_s[i].perp(), kappa) );
 	}
 	jets_s[i].set_user_info(new fastjet::MyUserInfo(q, -1, -999));
      }
@@ -357,8 +376,8 @@ namespace Rivet
 		    zgs = sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry();
 		    mgs = sdjets_s[is].m();
 	    }	    
-	    mytxtfile << xsecweight << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << parton << ", " << mg << ", " << rg << ", " << zg << ", " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << parton_s << ", " << mgs << ", " << rgs << ", " << zgs << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << ", " << isJP2 << ", " << JP2_et << ", " << JP2_eta << ", " << JP2_phi << "\n";
-	    mytxtfile_long << xsecweight << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << parton << ", " << mg << ", " << rg << ", " << zg << ", " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << parton_s << ", " << mgs << ", " << rgs << ", " << zgs << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << ", " << isJP2 << ", " << JP2_et << ", " << JP2_eta << ", " << JP2_phi << "\n";
+	    mytxtfile << xsecweight << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << parton << ", " << mg << ", " << rg << ", " << zg << ", " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << parton_s << ", " << mgs << ", " << rgs << ", " << zgs << ", " << i << ", " << is << ", " << trans_pt.size() << ", " << trans_s_pt.size() << ", " << trans_05_pt.size() << ", " << trans_s_05_pt.size() << ", " << trans_ptavg << ", " << trans_s_ptavg << ", " << trans_05_ptavg << ", " << trans_s_05_ptavg << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << ", " << isJP2 << ", " << JP2_et << ", " << JP2_eta << ", " << JP2_phi << "\n";
+	    mytxtfile_long << xsecweight << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << parton << ", " << mg << ", " << rg << ", " << zg << ", " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << parton_s << ", " << mgs << ", " << rgs << ", " << zgs << ", " << i << ", " << is << ", " << trans_pt.size() << ", " << trans_s_pt.size() << ", " << trans_05_pt.size() << ", " << trans_s_05_pt.size() << ", " << trans_ptavg << ", " << trans_s_ptavg << ", " << trans_05_ptavg << ", " << trans_s_05_ptavg << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << ", " << isJP2 << ", " << JP2_et << ", " << JP2_eta << ", " << JP2_phi << "\n";
 	    break;
 	  }
         }
@@ -388,7 +407,7 @@ namespace Rivet
 	    mg = sdjets[i].m();
 	}	    
 	    
-        mytxtfile_long << "-999, -999, -999, -999, -999, -999, -999, -999, " << xsecweight << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << parton << ", " << mg << ", " << rg << ", " << zg << ", -999, -999, -999, -999, -999, -999, -999, -999, -999, " << i << ", " << jets[i].delta_R(partons.at(0)) <<", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << ", " << isJP2 <<  ", " << JP2_et << ", " << JP2_eta << ", " << JP2_phi << "\n";}
+        mytxtfile_long << "-999, -999, -999, -999, -999, " << xsecweight << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << parton << ", " << mg << ", " << rg << ", " << zg << ", -999, -999, -999, -999, -999, -999, -999, -999, -999, " << i << ", -999, " << trans_pt.size() << ", -999, " << trans_05_pt.size() << ", -999, " << trans_ptavg << ", -999, " << trans_05_ptavg << ", -999, " << jets[i].delta_R(partons.at(0)) <<", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << ", " << isJP2 <<  ", " << JP2_et << ", " << JP2_eta << ", " << JP2_phi << "\n";}
       
       for (unsigned int is = 0; is < jets_s.size(); is++)
       {
@@ -398,7 +417,7 @@ namespace Rivet
         vector <double> jet_q_s = jets_s[is].user_info<fastjet::MyUserInfo>().q();
 	int parton_s = jets_s[is].user_info<fastjet::MyUserInfo>().parton();
         jets_s[is].set_user_info(new fastjet::MyUserInfo(jet_q_s, fake, parton_s));
- 	mytxtfile_long << "-999, -999, -999, -999, -999, -999, -999, -999, ";
+ 	mytxtfile_long << "-999, -999, -999, -999, -999, ";
  	for (vector<double>::iterator it = jet_q_s.begin(); it != jet_q_s.end(); ++it){
 		    mytxtfile_long << *it << ", "; 
 	}
@@ -415,7 +434,7 @@ namespace Rivet
 		    mgs = sdjets_s[is].m();
 	}	    
 	    
-	mytxtfile_long << xsecweight << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << parton_s << ", " << mgs << ", " << rgs << ", " << zgs << ", -999, -999, -999, -999, " << isJP2 <<  ", " << JP2_et << ", " << JP2_eta << ", " << JP2_phi << "\n";
+	mytxtfile_long << xsecweight << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << parton_s << ", " << mgs << ", " << rgs << ", " << zgs << ", -999, " << is << ", -999, " << trans_s_pt.size() << ", -999, " << trans_s_05_pt.size() << ", -999, " << trans_s_ptavg << ", -999, " << trans_s_05_ptavg << ", -999, -999, -999, " << isJP2 <<  ", " << JP2_et << ", " << JP2_eta << ", " << JP2_phi << "\n";
       }
 
    }
@@ -435,6 +454,7 @@ namespace Rivet
     std::ofstream mytxtfile_long;
     ifstream efftxtfile;
     double etaMax = 1.0;
+    double pi = 3.14159265359;
     double phiMax = 2*3.14159265359;
     int Nbounds_JP_eta = (int)2 * etaMax;
     int Nbounds_JP_phi = (int)phiMax;
