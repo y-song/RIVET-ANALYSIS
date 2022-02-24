@@ -81,8 +81,10 @@ namespace Rivet
 	     }
       }
 
-      mytxtfile.open("pythia_20_pthat_20_pt_jets_full_matched_no_hadronization.txt");
-      mytxtfile_long.open("pythia_20_pthat_20_pt_jets_full_no_hadronization.txt");
+      mytxtfile.open("pythia_10pthat_10pt_jets_full_matched_r06.txt");
+      mytxtfile_long.open("pythia_10pthat_10pt_jets_full_r06.txt");
+      //mytxtfile.open("pythia_10pthat_10pt_jets_full_matched_test.txt");
+      //mytxtfile_long.open("pythia_10pthat_10pt_jets_full_test.txt");
       
       for (int i = 0; i <= Nbounds_JP_eta; ++i){
 	      double etax = -1 * etaMax + i * (double)2 * etaMax / Nbounds_JP_eta;
@@ -205,7 +207,7 @@ namespace Rivet
 
       for (int x = 0; x < Nbounds_JP_eta; ++x) {
 	      for (int y = 0; y < Nbounds_JP_phi; ++y) {
-		      if (e_JP[x][y] > 14.4) {
+		      if (e_JP[x][y] > 7.3) {
 			      isJP2 = 1;
 			      JP2_et = e_JP[x][y];
 			      JP2_eta = x;
@@ -216,9 +218,9 @@ namespace Rivet
       }
 
       // jet selectors
-      fastjet::Selector selector = fastjet::SelectorPtMin(20.0)*fastjet::SelectorEtaRange(-0.6,0.6);
+      fastjet::Selector selector = fastjet::SelectorPtMin(10.0)*fastjet::SelectorEtaRange(-0.4,0.4);
 
-      fastjet::JetDefinition jet_def(fastjet::antikt_algorithm, 0.4);
+      fastjet::JetDefinition jet_def(fastjet::antikt_algorithm, 0.6);
 
       fastjet::contrib::SoftDrop sd(0, 0.1);
  
@@ -245,7 +247,9 @@ namespace Rivet
 	for (PseudoJet &part_ch : parts_ch)
       	{
 		if (abs(jets[0].delta_phi_to(part_ch)) < pi/3 || abs(jets[0].delta_phi_to(part_ch)) > 2*pi/3)	continue;
-        	trans_pt.push_back(part_ch.perp());
+        	if (part_ch.perp() > 0.2){
+			trans_pt.push_back(part_ch.perp());
+		}
 		if (part_ch.perp() > 0.5){
 			trans_05_pt.push_back(part_ch.perp());
 		}
@@ -256,7 +260,9 @@ namespace Rivet
 	for (PseudoJet &part_s_ch : parts_s_ch)
       	{
 		if (abs(jets_s[0].delta_phi_to(part_s_ch)) < pi/3 || abs(jets_s[0].delta_phi_to(part_s_ch)) > 2*pi/3)	continue;
-        	trans_s_pt.push_back(part_s_ch.perp());
+        	if (part_s_ch.perp() > 0.2){
+			trans_s_pt.push_back(part_s_ch.perp());
+		}
 		if (part_s_ch.perp() > 0.5){
 			trans_s_05_pt.push_back(part_s_ch.perp());
 		}
