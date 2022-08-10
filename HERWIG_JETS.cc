@@ -84,7 +84,7 @@ namespace Rivet
         }
       }
 
-      mytxtfile.open("pythia_35pthat.txt");
+      mytxtfile.open("pythia_20pthat25.txt");
 
       for (int i = 0; i <= Nbounds_JP_eta; ++i)
       {
@@ -347,7 +347,7 @@ namespace Rivet
         jets[i].set_user_info(new fastjet::MyUserInfo(jet_q, missing, parton));
         for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
         {
-          mytxtfile << *it << ", ";
+          mytxtfile << *it << ", -999, ";
         }
         mytxtfile << xsecweight << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << parton << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << "\n";
       }
