@@ -86,7 +86,7 @@ namespace Rivet
       }
 
       // open output file
-      mytxtfile.open("pythia_35pthat_wbadtowers_truthwodecay_wtowergap.txt");
+      mytxtfile.open("pythia_5pthat9_wbadtowers_truthwodecay_wtowergap.txt");
 
       // make JP grids
       for (int i = 0; i <= Nbounds_JP_eta; ++i)
@@ -261,6 +261,7 @@ namespace Rivet
           }
           if (bad_tower)
           {
+            //cout << "bad tower pT: " << pj_smeared.perp() << endl;
             continue;
           }
           pj_smeared.set_user_info(new fastjet::ParticleInfo(charge, pid));
@@ -337,6 +338,8 @@ namespace Rivet
         }
       }
 
+      //cout << "pythia, geant: " << parts.size() << ", " << parts_s.size() << endl;
+
       // jet selectors
       // THIS IS NOT THE DEFAULT!
       fastjet::Selector selector = fastjet::SelectorPtMin(5.0) * fastjet::SelectorEtaRange(-0.6, 0.6);
@@ -394,7 +397,6 @@ namespace Rivet
       // Match jets to partons
       HepMC::GenEvent *theEvent = (HepMC::GenEvent *)event.genEvent();
       int evid = theEvent->event_number();
-
       for (HepMC::GenEvent::particle_iterator p = theEvent->particles_begin(); p != theEvent->particles_end(); ++p)
       {
 
@@ -447,7 +449,7 @@ namespace Rivet
             {
               mytxtfile << *it << ", ";
             }
-            mytxtfile << xsecweight << ", " << evid << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << parton << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << jets_s[is].perp() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << parton_s << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << "\n";
+            mytxtfile << xsecweight << ", " << evid << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << parton << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << jets_s[is].perp() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << parton_s << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << ", " << parts.size() << ", " << parts_s.size() <<"\n";
             break;
           }
         }
@@ -464,7 +466,7 @@ namespace Rivet
         {
           mytxtfile << *it << ", -999, ";
         }
-        mytxtfile << xsecweight << ", " << evid << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << parton << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << "\n";
+        mytxtfile << xsecweight << ", " << evid << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << parton << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << ", " << parts.size() << ", " << parts_s.size() << "\n";
       }
       for (unsigned int is = 0; is < jets_s.size(); is++)
       {
@@ -478,13 +480,12 @@ namespace Rivet
         {
           mytxtfile << *it << ", ";
         }
-        mytxtfile << xsecweight << ", " << evid << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << parton_s << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", -999, -999, -999, -999\n";
+        mytxtfile << xsecweight << ", " << evid << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << parton_s << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", -999, -999, -999, -999"  << ", " << parts.size() << ", " << parts_s.size() << "\n";
       }
     }
 
     /// Normalise histograms etc., after the run
-    void
-    finalize()
+    void finalize()
     {
       double norm = crossSection() / sumOfWeights();
       std::cout << norm << std::endl;
