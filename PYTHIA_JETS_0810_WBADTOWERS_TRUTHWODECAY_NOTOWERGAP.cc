@@ -86,7 +86,7 @@ namespace Rivet
       }
 
       // open output file
-      mytxtfile.open("pythia_35pthat_0908.txt");
+      mytxtfile.open("pythia_5pthat9_0908.txt");
 
       // make JP grids
       for (int i = 0; i <= Nbounds_JP_eta; ++i)
@@ -227,8 +227,10 @@ namespace Rivet
           PseudoJet pj_smeared(p.px() * ratio, p.py() * ratio, p.pz() * ratio, es);
           pj_smeared.reset_momentum(pj_smeared.px(), pj_smeared.py(), pj_smeared.pz(), sqrt(pow(pj_smeared.px(), 2) + pow(pj_smeared.py(), 2) + pow(pj_smeared.pz(), 2)));
           if (pj_smeared.Et() > 30.)
+          {
             reject = 3;
-          continue;
+            continue;
+          }
           if (pj_smeared.Et() < 0.2 || abs(pj_smeared.eta()) > 1.0)
             continue;
           bool bad_tower = false;
@@ -283,8 +285,10 @@ namespace Rivet
           PseudoJet pj_smeared(p.px() * ratio, p.py() * ratio, p.pz() * ratio, p.E() * ratio);
           pj_smeared.reset_momentum(pj_smeared.px(), pj_smeared.py(), pj_smeared.pz(), sqrt(pow(pj_smeared.px(), 2) + pow(pj_smeared.py(), 2) + pow(pj_smeared.pz(), 2) + pow(0.1395704, 2))); // charged pion mass
           if (pj_smeared.perp() > 30.)
+          {
             reject = 3;
-          continue;
+            continue;
+          }
           if (pj_smeared.perp() < 0.2 || abs(pj_smeared.eta()) > 1.0)
             continue;
           pj_smeared.set_user_info(new fastjet::ParticleInfo(charge, pid));
@@ -481,7 +485,8 @@ namespace Rivet
         {
           mytxtfile << *it << ", ";
         }
-        mytxtfile << xsecweight << ", " << evid << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << parton_s << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", -999, -999, -999, -999" << ", " << isJP2 << ", " << JP2_et << ", " << JP2_eta << ", " << JP2_phi << "\n";
+        mytxtfile << xsecweight << ", " << evid << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].eta() << ", " << jets_s[is].phi() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << parton_s << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", -999, -999, -999, -999"
+                  << ", " << isJP2 << ", " << JP2_et << ", " << JP2_eta << ", " << JP2_phi << "\n";
       }
     }
 
