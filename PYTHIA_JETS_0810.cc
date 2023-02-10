@@ -264,7 +264,7 @@ namespace Rivet
           {
             PseudoJet part = jets[i].constituents().at(j);
             cout << j << ", " << part.perp() << ", " << part.rap() << ", " << part.phi() << ", " << part.e() << ", " << part.px() << ", " << part.py() << ", " << part.pz() << endl;
-          }
+         }
         }
       }
 
