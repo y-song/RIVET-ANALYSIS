@@ -86,7 +86,7 @@ namespace Rivet
       }
 
       // open output file
-      mytxtfile.open("test.txt");
+      mytxtfile.open("pythia_20pthat25_nohad.txt");
 
       // make JP grids
       for (int i = 0; i <= Nbounds_JP_eta; ++i)
@@ -254,20 +254,6 @@ namespace Rivet
       vector<fastjet::PseudoJet> jets_s = sorted_by_pt(selector_s(cs_s.inclusive_jets()));
       vector<fastjet::PseudoJet> sdjets_s = sd(jets_s);
 
-      // print the particles of a jet with dM>3
-      for (unsigned int i = 0; i < jets.size(); i++)
-      {
-        if (evid == 232 && i == 0)
-        {
-          cout << jets[i].perp() << ", " << jets[i].eta() << ", " << jets[i].phi() << endl;
-          for (unsigned int j = 0; j < jets[i].constituents().size(); j++)
-          {
-            PseudoJet part = jets[i].constituents().at(j);
-            cout << j << ", " << part.perp() << ", " << part.rap() << ", " << part.phi() << ", " << part.e() << ", " << part.px() << ", " << part.py() << ", " << part.pz() << endl;
-         }
-        }
-      }
-
       //-------------------------------------------
       // calculate pythia-level jet charge
       for (unsigned int i = 0; i < jets.size(); i++)
@@ -352,24 +338,6 @@ namespace Rivet
             int parton_s = jets_s[is].user_info<fastjet::MyUserInfo>().parton();
             jets[i].set_user_info(new fastjet::MyUserInfo(jet_q, matched, parton));
             jets_s[is].set_user_info(new fastjet::MyUserInfo(jet_q_s, matched, parton_s));
-            /*double numerator_test = 0;
-            for (unsigned int j = 0; j < jets[i].constituents().size(); j++)
-            {
-              int rand_q = rand() % 3 - 1;
-              PseudoJet part = jets[i].constituents().at(j);
-              numerator_test += rand_q * pow(part.perp(), 2.0);
-            }
-            double q_test = numerator_test / pow(jets[i].perp(), 2.0);
-            mytxtfile << q_test << ", ";
-            double numerator_test_s = 0;
-            for (unsigned int js = 0; js < jets_s[is].constituents().size(); js++)
-            {
-              int rand_q = rand() % 3 - 1;
-              PseudoJet part_s = jets_s[is].constituents().at(js);
-              numerator_test_s += rand_q * pow(part_s.perp(), 2.0);
-            }
-            double q_test_s = numerator_test_s / pow(jets_s[is].perp(), 2.0);
-            mytxtfile << q_test_s << ", ";*/
             for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
             {
               mytxtfile << *it << ", ";
@@ -378,9 +346,7 @@ namespace Rivet
             {
               mytxtfile << *it << ", ";
             }
-            mytxtfile << xsecweight << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << parton << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << parton_s << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << "\n";
-            if (jets[i].m() - sdjets[i].m() > 3)
-              cout << evid << ", " << sdjets[i].perp() << ", " << sdjets[i].eta() << ", " << sdjets[i].phi() << endl;
+            mytxtfile << xsecweight << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << parton << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << sdjets[i].constituents().size() << ", " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << parton_s << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << sdjets_s[is].constituents().size() << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << "\n";
             break;
           }
         }
@@ -393,21 +359,12 @@ namespace Rivet
         vector<double> jet_q = jets[i].user_info<fastjet::MyUserInfo>().q();
         int parton = jets[i].user_info<fastjet::MyUserInfo>().parton();
         jets[i].set_user_info(new fastjet::MyUserInfo(jet_q, missing, parton));
-        /*double numerator_test = 0;
-        for (unsigned int j = 0; j < jets[i].constituents().size(); j++)
-        {
-          int rand_q = rand() % 3 - 1;
-          PseudoJet part = jets[i].constituents().at(j);
-          numerator_test += rand_q * pow(part.perp(), 2.0);
-        }
-        double q_test = numerator_test / pow(jets[i].perp(), 2.0);
-        mytxtfile << q_test << ", -999, ";*/
 
-        for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
+	for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
         {
           mytxtfile << *it << ", -999, ";
         }
-        mytxtfile << xsecweight << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << parton << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << "\n";
+        mytxtfile << xsecweight << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << parton << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << sdjets[i].constituents().size() << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << i << ", " << jets[i].delta_R(partons.at(0)) << ", " << jets[i].delta_R(partons.at(1)) << ", " << theEvent->event_scale() << "\n";
       }
       for (unsigned int is = 0; is < jets_s.size(); is++)
       {
@@ -416,21 +373,13 @@ namespace Rivet
         vector<double> jet_q_s = jets_s[is].user_info<fastjet::MyUserInfo>().q();
         int parton_s = jets_s[is].user_info<fastjet::MyUserInfo>().parton();
         jets_s[is].set_user_info(new fastjet::MyUserInfo(jet_q_s, fake, parton_s));
-        /*double numerator_test_s = 0;
-        for (unsigned int js = 0; js < jets_s[is].constituents().size(); js++)
-        {
-          int rand_q = rand() % 3 - 1;
-          PseudoJet part_s = jets_s[is].constituents().at(js);
-          numerator_test_s += rand_q * pow(part_s.perp(), 2.0);
-        }
-        double q_test_s = numerator_test_s / pow(jets_s[is].perp(), 2.0);
-        mytxtfile << "-999, " << q_test_s << ", ";*/
-        mytxtfile << "-999, ";
+
+ 	mytxtfile << "-999, ";
         for (vector<double>::iterator it = jet_q_s.begin(); it != jet_q_s.end(); ++it)
         {
           mytxtfile << *it << ", ";
         }
-        mytxtfile << xsecweight << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << parton_s << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", -999, -999, -999, -999\n";
+        mytxtfile << xsecweight << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << parton_s << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << sdjets_s[is].constituents().size() << ", -999, -999, -999, -999\n";
       }
     }
 
