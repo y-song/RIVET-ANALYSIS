@@ -44,14 +44,14 @@ namespace fastjet
     double y2_ch() const { return _y2_ch; }
     double phi1_ch() const { return _phi1_ch; }
     double phi2_ch() const { return _phi2_ch; }
-    int pid1_ch()  const { return _pid1_ch; }
-    int pid2_ch()  const { return _pid2_ch; }
+    int pid1_ch() const { return _pid1_ch; }
+    int pid2_ch() const { return _pid2_ch; }
     double y1() const { return _y1; }
     double y2() const { return _y2; }
     double phi1() const { return _phi1; }
     double phi2() const { return _phi2; }
-    int pid1()  const { return _pid1; }
-    int pid2()  const { return _pid2; }
+    int pid1() const { return _pid1; }
+    int pid2() const { return _pid2; }
     double q() const { return _q; }
     int parton() const { return _parton; }
 
@@ -124,7 +124,7 @@ namespace Rivet
       }
 
       // open output file
-      mytxtfile.open("pythia_50pthat_rc.txt");
+      mytxtfile.open("pythia_30pthat35_rc.txt");
 
       // make JP grids
       for (int i = 0; i <= Nbounds_JP_eta; ++i)
@@ -391,6 +391,8 @@ namespace Rivet
         double y2s = 0;
         double phi1s = 0;
         double phi2s = 0;
+        int pid1s = 0;
+        int pid2s = 0;
         double qs = 0;
 
         vector<fastjet::PseudoJet> IncPart = sorted_by_pt(jets_s[is].constituents());
@@ -493,7 +495,7 @@ namespace Rivet
         }
         jets[i].set_user_index(missing);
 
-        mytxtfile << jets[i].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().b() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pid1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pid2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pid1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pid2() << ", -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, " << jets[i].user_info<fastjet::DihadronInfo>().q() << ", -9, ";
+        mytxtfile << jets[i].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().b() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pid1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pid2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pid1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pid2() << ", -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, " << jets[i].user_info<fastjet::DihadronInfo>().q() << ", -9, ";
 
         /*for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
         {
