@@ -64,7 +64,7 @@ namespace Rivet
       declare(fs, "fs");
 
       // open output file
-      mytxtfile.open("herwig_11pthat15_trkfn_bbar.txt");
+      mytxtfile.open("herwig_500pthat_trkfn_bbar.txt");
 
     }
     
@@ -104,7 +104,7 @@ namespace Rivet
 
       //===========================================
       // jet selectors
-      fastjet::Selector selector = fastjet::SelectorPtMin(15.0) * fastjet::SelectorEtaRange(-2.0, 2.0);
+      fastjet::Selector selector = fastjet::SelectorPtMin(500.0) * fastjet::SelectorEtaRange(-2.0, 2.0);
       fastjet::JetDefinition jet_def(fastjet::antikt_algorithm, 0.4);
       fastjet::ClusterSequence cs(parts, jet_def);
       vector<fastjet::PseudoJet> jets = sorted_by_pt(selector(cs.inclusive_jets()));
@@ -115,21 +115,25 @@ namespace Rivet
       {
 	   double xb = 0.;
 	   double xbbar = 0.;
-	   
+	   int nb = 0;
+	   int nbbar = 0;
+
 	   // constituent loop
 	   for (unsigned int j = 0; j < jets[i].constituents().size(); j++)
            {
             	PseudoJet part = jets[i].constituents().at(j);
 	    	if ( part.user_info<fastjet::ParticleInfo>().baryon() == 1 )
 	    	{	
+			nb += 1;
 			xb += part.perp()/jets[i].perp();
    		}
 		else if ( part.user_info<fastjet::ParticleInfo>().baryon() == -1 )
 	    	{	
+			nbbar += 1;
 			xbbar += part.perp()/jets[i].perp();
    		}
 	   }
-	   mytxtfile << evid << ", " << i << ", " << xsecweight << ", " << theEvent->event_scale() << ", " << jets[i].perp() << ", " << jets[i].eta() << ", " << xb << ", " << xbbar << endl;		
+	   mytxtfile << evid << ", " << i << ", " << xsecweight << ", " << theEvent->event_scale() << ", " << jets[i].perp() << ", " << jets[i].eta() << ", " << nb << ", " << nbbar << ", " << xb << ", " << xbbar << endl;		
        }   
     }
 
