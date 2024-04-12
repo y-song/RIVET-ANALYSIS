@@ -124,7 +124,7 @@ namespace Rivet
       }
 
       // open output file
-      mytxtfile.open("pythia_30pthat35_rc.txt");
+      mytxtfile.open("pythia_PTMINpthatPTMAX_rc.txt");
 
       // make JP grids
       for (int i = 0; i <= Nbounds_JP_eta; ++i)
@@ -272,7 +272,7 @@ namespace Rivet
       }
 
       HepMC::GenEvent *theEvent = (HepMC::GenEvent *)event.genEvent();
-      int evid = theEvent->event_number();
+      // int evid = theEvent->event_number();
 
       //===========================================
       // jet selectors
@@ -481,7 +481,7 @@ namespace Rivet
                 mytxtfile << *it << ", ";
             }*/
 
-            mytxtfile << xsecweight << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << -999 << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << -999 << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << i << ", " << theEvent->event_scale() << "\n";
+            mytxtfile << xsecweight << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].eta() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << -999 << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << -999 << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << i << ", " << theEvent->event_scale() << "\n";
             break;
           }
         }
@@ -502,7 +502,7 @@ namespace Rivet
           mytxtfile << *it << ", -999, ";
         }*/
 
-        mytxtfile << xsecweight << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << -999 << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << i << ", " << theEvent->event_scale() << "\n";
+        mytxtfile << xsecweight << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].eta() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << -999 << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << i << ", " << theEvent->event_scale() << "\n";
       }
       for (unsigned int is = 0; is < jets_s.size(); is++)
       {
@@ -518,7 +518,7 @@ namespace Rivet
           mytxtfile << *it << ", ";
         }*/
 
-        mytxtfile << xsecweight << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", -999, " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", -999, -999\n";
+        mytxtfile << xsecweight << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", -999, " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", -999, -999\n";
       }
     }
 
