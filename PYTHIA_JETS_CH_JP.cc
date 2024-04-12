@@ -141,14 +141,14 @@ namespace Rivet
         if (neutral)
         {
           double es, ratio;
-          normal_distribution<double> smearNeutral(p.E(), 0.14 * p.E());
+          if (p.Et() < 0.2 || p.Et() > 30.)
+		  continue;
+	  normal_distribution<double> smearNeutral(p.E(), 0.14 * p.E());
           es = smearNeutral(generator);
-          if (es < 0.2 || es > 30.)
-            continue;
           ratio = es / p.E();
           PseudoJet pj_smeared(p.px() * ratio, p.py() * ratio, p.pz() * ratio, es);
           pj_smeared.reset_momentum(pj_smeared.px(), pj_smeared.py(), pj_smeared.pz(), sqrt(pow(pj_smeared.px(),2)+pow(pj_smeared.py(),2)+pow(pj_smeared.pz(),2)));
-	  if (pj_smeared.perp() < 0.2 || pj_smeared.perp() > 30.)
+	  if (pj_smeared.Et() < 0.2 || pj_smeared.Et() > 30.)
             continue;
           pj_smeared.set_user_info(new fastjet::ParticleInfo(charge,pid));
           parts_s.push_back(pj_smeared);

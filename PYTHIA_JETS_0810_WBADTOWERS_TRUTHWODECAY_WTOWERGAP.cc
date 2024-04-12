@@ -86,7 +86,7 @@ namespace Rivet
       }
 
       // open output file
-      mytxtfile.open("pythia_5pthat9_wbadtowers_truthwodecay_wtowergap.txt");
+      mytxtfile.open("pythia_35pthat_wdecay.txt");
 
       // make JP grids
       for (int i = 0; i <= Nbounds_JP_eta; ++i)
@@ -151,6 +151,7 @@ namespace Rivet
         // check if the particle is from decay
         if (p.fromHadron() && (parent.abspid() == 111 || parent.abspid() == 211 || parent.abspid() == 221 || parent.abspid() == 321 || parent.abspid() == 310 || parent.abspid() == 130 || parent.abspid() == 3122 || parent.abspid() == 3212 || parent.abspid() == 3112 || parent.pid() == 3222 || parent.abspid() == 3312 || parent.abspid() == 3322 || parent.abspid() == 3334)) // from a hadron weak decay
         {
+          cout << "!" << endl;
           all_children_index.push_back(i);
           if (parents.size() > 1)
           {
@@ -170,7 +171,7 @@ namespace Rivet
               break;
             }
           }
-          if (recorded)
+          if (recorded || parent.perp() > 30 || parent.abseta() > 1.0)
             continue;
           all_parents.push_back(parent);
         }
