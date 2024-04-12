@@ -116,7 +116,7 @@ namespace Rivet
       }
 
       // open output file
-      mytxtfile.open("herwig_10pthat11_rc.txt");
+      mytxtfile.open("herwig_50pthat_rc_r06.txt");
 
       // make JP grids
       for (int i = 0; i <= Nbounds_JP_eta; ++i)
@@ -268,10 +268,10 @@ namespace Rivet
 
       //===========================================
       // jet selectors
-      fastjet::Selector selector = fastjet::SelectorPtMin(5.0) * fastjet::SelectorEtaRange(-0.6, 0.6);
-      fastjet::Selector selector_s = fastjet::SelectorPtMin(15.0) * fastjet::SelectorEtaRange(-0.6, 0.6); // * fastjet::SelectorMassMin(1.0);
+      fastjet::Selector selector = fastjet::SelectorPtMin(5.0) * fastjet::SelectorEtaRange(-0.4, 0.4);
+      fastjet::Selector selector_s = fastjet::SelectorPtMin(15.0) * fastjet::SelectorEtaRange(-0.4, 0.4); // * fastjet::SelectorMassMin(1.0);
 
-      fastjet::JetDefinition jet_def(fastjet::antikt_algorithm, 0.4);
+      fastjet::JetDefinition jet_def(fastjet::antikt_algorithm, 0.6);
 
       fastjet::contrib::SoftDrop sd(0, 0.1);
 
@@ -286,6 +286,7 @@ namespace Rivet
 
       //-------------------------------------------
       // calculate pythia-level jet charge and leading dihadrons
+      double kappa = 0.5;
       for (unsigned int i = 0; i < jets.size(); i++)
       {
         double b_ch = 0;
@@ -317,7 +318,7 @@ namespace Rivet
           phi1 = (IncPart.at(0)).phi();
           phi2 = (IncPart.at(1)).phi();
         }
-        double numerator = 0;
+       double numerator = 0;
         for (unsigned int j = 0; j < IncPart.size(); j++)
         {
           PseudoJet part = IncPart.at(j);
@@ -352,7 +353,7 @@ namespace Rivet
         IncPart.clear();
         ChargedPart.clear();
       }
-
+      
       //-------------------------------------------
       // calculate smeared jet charge and dihadrons
       for (unsigned int is = 0; is < jets_s.size(); is++)
@@ -368,7 +369,7 @@ namespace Rivet
         double phi1s = 0;
         double phi2s = 0;
         double qs = 0;
-        vector<fastjet::PseudoJet> IncPart = sorted_by_pt(jets_s[is].constituents());
+ 	vector<fastjet::PseudoJet> IncPart = sorted_by_pt(jets_s[is].constituents());
         vector<fastjet::PseudoJet> ChargedPart;
         if (IncPart.size() < 2)
         {
@@ -386,7 +387,7 @@ namespace Rivet
           phi1s = (IncPart.at(0)).phi();
           phi2s = (IncPart.at(1)).phi();
         }
-        double numerator = 0;
+       double numerator = 0;
         for (unsigned int j = 0; j < IncPart.size(); j++)
         {
           PseudoJet part = IncPart.at(j);
@@ -399,115 +400,115 @@ namespace Rivet
           numerator += pow(part.perp(), kappa) * charge;
         }
         qs = numerator / pow(jets_s[is].perp(), kappa);
-        if (ChargedPart.size() < 2)
-        {
-          bs_ch = -9;
-          y1s_ch = -9;
-          y2s_ch = -9;
-          phi1s_ch = -9;
-          phi2s_ch = -9;
-        }
-        else
-        {
-          bs_ch = (ChargedPart.at(0)).user_info<fastjet::ParticleInfo>().charge() * (ChargedPart.at(1)).user_info<fastjet::ParticleInfo>().charge();
-          y1s_ch = (ChargedPart.at(0)).rap();
-          y2s_ch = (ChargedPart.at(1)).rap();
-          phi1s_ch = (ChargedPart.at(0)).phi();
-          phi2s_ch = (ChargedPart.at(1)).phi();
-        }
-        jets_s[is].set_user_index(-1);
-        jets_s[is].set_user_info(new fastjet::DihadronInfo(bs_ch, bs, y1s_ch, y2s_ch, phi1s_ch, phi2s_ch, y1s, y2s, phi1s, phi2s, qs, -999));
-        IncPart.clear();
-        ChargedPart.clear();
-      }
-
-      //-------------------------------------------
-      // Match smeared jets with unsmeared jets
-      for (unsigned int i = 0; i < jets.size(); i++)
+      
+      if (ChargedPart.size() < 2)
       {
-        for (unsigned int is = 0; is < jets_s.size(); is++)
-        {
-          if (jets_s[is].user_index() == matched)
-            continue;
-          if (jets[i].delta_R(jets_s[is]) < 0.4)
-          {
-
-            jets[i].set_user_index(matched);
-            jets_s[is].set_user_index(matched);
-            mytxtfile << jets[i].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().b() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().b() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y1() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y2() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().q() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().q() << ", ";
-
-            /*for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
-            {
-              mytxtfile << *it << ", ";
-            }
-            for (vector<double>::iterator it = jet_q_s.begin(); it != jet_q_s.end(); ++it)
-            {
-              mytxtfile << *it << ", ";
-            }*/
-
-            mytxtfile << xsecweight << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << -999 << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << -999 << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << i << ", " << theEvent->event_scale() << "\n";
-            break;
-          }
-        }
+        bs_ch = -9;
+        y1s_ch = -9;
+        y2s_ch = -9;
+        phi1s_ch = -9;
+        phi2s_ch = -9;
       }
-
-      for (unsigned int i = 0; i < jets.size(); i++)
+      else
       {
-        if (jets[i].user_index() == matched)
-        {
-          continue;
-        }
-        jets[i].set_user_index(missing);
-
-        mytxtfile << jets[i].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().b() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2() << ", -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, " << jets[i].user_info<fastjet::DihadronInfo>().q() << ", -9, ";
-
-        /*for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
-        {
-          mytxtfile << *it << ", -999, ";
-        }*/
-
-        mytxtfile << xsecweight << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << -999 << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << i << ", " << theEvent->event_scale() << "\n";
+        bs_ch = (ChargedPart.at(0)).user_info<fastjet::ParticleInfo>().charge() * (ChargedPart.at(1)).user_info<fastjet::ParticleInfo>().charge();
+        y1s_ch = (ChargedPart.at(0)).rap();
+        y2s_ch = (ChargedPart.at(1)).rap();
+        phi1s_ch = (ChargedPart.at(0)).phi();
+        phi2s_ch = (ChargedPart.at(1)).phi();
       }
+      jets_s[is].set_user_index(-1);
+      jets_s[is].set_user_info(new fastjet::DihadronInfo(bs_ch, bs, y1s_ch, y2s_ch, phi1s_ch, phi2s_ch, y1s, y2s, phi1s, phi2s, qs, -999));
+      IncPart.clear();
+      ChargedPart.clear();
+    }
+
+    //-------------------------------------------
+    // Match smeared jets with unsmeared jets
+    for (unsigned int i = 0; i < jets.size(); i++)
+    {
       for (unsigned int is = 0; is < jets_s.size(); is++)
       {
         if (jets_s[is].user_index() == matched)
           continue;
-        jets_s[is].set_user_index(fake);
-
-        mytxtfile << "-9, -9, -9, -9, -9, -9, -9, -9, -9, -9, " << jets_s[is].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().b() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y1() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y2() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi2() << ", -9, " << jets_s[is].user_info<fastjet::DihadronInfo>().q() << ", ";
-
-        /*mytxtfile << "-999, ";
-        for (vector<double>::iterator it = jet_q_s.begin(); it != jet_q_s.end(); ++it)
+        if (jets[i].delta_R(jets_s[is]) < 0.4)
         {
-          mytxtfile << *it << ", ";
-        }*/
 
-        mytxtfile << xsecweight << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", -999, "
-                  << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", -999, -999\n";
+          jets[i].set_user_index(matched);
+          jets_s[is].set_user_index(matched);
+          mytxtfile << jets[i].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().b() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().b() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y1() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y2() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().q() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().q() << ", ";
+
+          /*for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
+          {
+            mytxtfile << *it << ", ";
+          }
+          for (vector<double>::iterator it = jet_q_s.begin(); it != jet_q_s.end(); ++it)
+          {
+            mytxtfile << *it << ", ";
+          }*/
+
+          mytxtfile << xsecweight << ", " << matched << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << -999 << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", " << -999 << ", " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << i << ", " << theEvent->event_scale() << "\n";
+          break;
+        }
       }
     }
 
-    /// Normalise histograms etc., after the run
-    void finalize()
+    for (unsigned int i = 0; i < jets.size(); i++)
     {
-      double norm = crossSection() / sumOfWeights();
-      std::cout << norm << std::endl;
-      mytxtfile.close();
+      if (jets[i].user_index() == matched)
+      {
+        continue;
+      }
+      jets[i].set_user_index(missing);
+
+      mytxtfile << jets[i].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().b() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2() << ", -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, " << jets[i].user_info<fastjet::DihadronInfo>().q() << ", -9, ";
+
+      /*for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
+      {
+        mytxtfile << *it << ", -999, ";
+      }*/
+
+      mytxtfile << xsecweight << ", " << missing << ", " << jets[i].perp() << ", " << jets[i].m() << ", " << jets[i].constituents().size() << ", " << -999 << ", " << sdjets[i].m() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets[i].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << -999 << ", " << i << ", " << theEvent->event_scale() << "\n";
     }
+    for (unsigned int is = 0; is < jets_s.size(); is++)
+    {
+      if (jets_s[is].user_index() == matched)
+        continue;
+      jets_s[is].set_user_index(fake);
 
-  private:
-    double eff_array[45][80];
-    std::ofstream mytxtfile;
-    ifstream efftxtfile;
-    double etaMax = 1.0;
-    double pi = 3.14159265359;
-    double phiMax = 2 * 3.14159265359;
-    int Nbounds_JP_eta = (int)2 * etaMax;
-    int Nbounds_JP_phi = (int)phiMax;
-    vector<double> etabins_JP;
-    vector<double> phibins_JP;
-    vector<vector<double>> e_JP;
-  };
+      mytxtfile << "-9, -9, -9, -9, -9, -9, -9, -9, -9, -9, " << jets_s[is].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().b() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y1() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().y2() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets_s[is].user_info<fastjet::DihadronInfo>().phi2() << ", -9, " << jets_s[is].user_info<fastjet::DihadronInfo>().q() << ", ";
 
-  RIVET_DECLARE_PLUGIN(HERWIG_JETS_rc);
+      /*mytxtfile << "-999, ";
+      for (vector<double>::iterator it = jet_q_s.begin(); it != jet_q_s.end(); ++it)
+      {
+        mytxtfile << *it << ", ";
+      }*/
+
+      mytxtfile << xsecweight << ", " << fake << ", -999, -999, -999, -999, -999, -999, -999, " << jets_s[is].perp() << ", " << jets_s[is].m() << ", " << jets_s[is].constituents().size() << ", -999, " << sdjets_s[is].m() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().delta_R() << ", " << sdjets_s[is].structure_of<fastjet::contrib::SoftDrop>().symmetry() << ", -999, -999\n";
+    }
+  }
+
+  /// Normalise histograms etc., after the run
+  void finalize()
+  {
+    double norm = crossSection() / sumOfWeights();
+    std::cout << norm << std::endl;
+    mytxtfile.close();
+  }
+
+private:
+  double eff_array[45][80];
+  std::ofstream mytxtfile;
+  ifstream efftxtfile;
+  double etaMax = 1.0;
+  double pi = 3.14159265359;
+  double phiMax = 2 * 3.14159265359;
+  int Nbounds_JP_eta = (int)2 * etaMax;
+  int Nbounds_JP_phi = (int)phiMax;
+  vector<double> etabins_JP;
+  vector<double> phibins_JP;
+  vector<vector<double>> e_JP;
+};
+
+RIVET_DECLARE_PLUGIN(HERWIG_JETS_rc);
 }
