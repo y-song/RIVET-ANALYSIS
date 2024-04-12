@@ -86,7 +86,7 @@ namespace Rivet
       }
 
       // open output file
-      mytxtfile.open("pythia_20pthat25_nohad.txt");
+      mytxtfile.open("pythia1208_50pthat.txt");
 
       // make JP grids
       for (int i = 0; i <= Nbounds_JP_eta; ++i)
@@ -125,7 +125,7 @@ namespace Rivet
         xgrid.clear();
       }
 
-      vector<double> k{2};
+      vector<double> k{0.5, 2};
       double xsecweight = handler().nominalCrossSection();
 
       //===========================================
@@ -292,8 +292,8 @@ namespace Rivet
         jets_s[is].set_user_info(new fastjet::MyUserInfo(q, -1, -999));
       }
 
-      //-------------------------------------------
-      // Match jets to partons
+     //-------------------------------------------
+     // Match jets to partons
       for (HepMC::GenEvent::particle_iterator p = theEvent->particles_begin(); p != theEvent->particles_end(); ++p)
       {
 
@@ -360,7 +360,7 @@ namespace Rivet
         int parton = jets[i].user_info<fastjet::MyUserInfo>().parton();
         jets[i].set_user_info(new fastjet::MyUserInfo(jet_q, missing, parton));
 
-        for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
+	for (vector<double>::iterator it = jet_q.begin(); it != jet_q.end(); ++it)
         {
           mytxtfile << *it << ", -999, ";
         }
@@ -374,7 +374,7 @@ namespace Rivet
         int parton_s = jets_s[is].user_info<fastjet::MyUserInfo>().parton();
         jets_s[is].set_user_info(new fastjet::MyUserInfo(jet_q_s, fake, parton_s));
 
-        mytxtfile << "-999, ";
+ 	mytxtfile << "-999, ";
         for (vector<double>::iterator it = jet_q_s.begin(); it != jet_q_s.end(); ++it)
         {
           mytxtfile << *it << ", ";
