@@ -120,7 +120,7 @@ namespace Rivet
       return rhoa;
     }
 
-    vector<double> get_direction(double jet_px, double jet_py, double jet_pz)
+    vector<double> get_direction_wrong(double jet_px, double jet_py, double jet_pz)
     {
       
       double random1 = (double)rand() / (double)RAND_MAX;
@@ -144,7 +144,7 @@ namespace Rivet
 
     }
 
-    void get_direction_andrew(double *rad, double *angle) // thanks Andrew!
+    void get_direction(double *rad, double *angle) // thanks Andrew!
     {
       double random1 = (double)rand() / (double)RAND_MAX;
       double random2 = (double)rand() / (double)RAND_MAX;
@@ -180,7 +180,7 @@ namespace Rivet
 
       std::random_device rd;
       std::default_random_engine generator(rd());
-      double rhoA_threshold = 100;//random_rhoa(generator);
+      double rhoA_threshold = random_rhoa(generator);
 
       for (unsigned int i = 0; i < jets.size(); i++)
       {
@@ -206,15 +206,10 @@ namespace Rivet
           std::random_device rd;
           std::default_random_engine generator(rd());
           double rad, angle;
-          /*vector<double> direction = get_direction(jets[i].px(), jets[i].py(), jets[i].pz());
-          double x_comp = direction.at(0);
-          double y_comp = direction.at(1);
-          double z_comp = direction.at(2);
-          double theta = acos(z_comp);*/
           int charge;
 
           // set kinematics
-          get_direction_andrew(&rad, &angle);
+          get_direction(&rad, &angle);
           double mt = random_mt(generator) + 0.2;
           double pt = sqrt(pow(mt, 2) - 0.13957 * 0.13957);
           double eta = jets[i].eta() + rad * sin(angle);
@@ -222,11 +217,6 @@ namespace Rivet
           double pz = sinh(eta) * pt;
           double py = sin(phi) * pt;
           double px = cos(phi) * pt;
-
-          /*double p = pt / sin(theta);
-          double px = p * x_comp;
-          double py = p * y_comp;
-          double pz = p * z_comp;*/
           double E = sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2) + 0.13957 * 0.13957);
 
           fastjet::PseudoJet pseudojet(px, py, pz, E);
@@ -257,14 +247,14 @@ namespace Rivet
 
         }
 
-        /* for testing */
+        /* for testing
         for (unsigned int j = 0; j < IncPart_unsort.size(); j++)
         {
           PseudoJet part = IncPart_unsort[j];
           mytxtfile << evid << ", " << part.pt() << ", " << part.eta() << ", " << part.phi() << ", " << part.user_info<fastjet::ParticleInfo>().j() << endl;
-        }
+        } */
 
-        /*vector<fastjet::PseudoJet> IncPart = sorted_by_pt(IncPart_unsort);
+        vector<fastjet::PseudoJet> IncPart = sorted_by_pt(IncPart_unsort);
         vector<fastjet::PseudoJet> ChargedPart = sorted_by_pt(ChargedPart_unsort);
 
         double b_ch = 0;
@@ -328,15 +318,16 @@ namespace Rivet
           phi2_ch = (ChargedPart.at(1)).phi();
         }
         jets[i].set_user_info(new fastjet::DihadronInfo(b_ch, b, pt1_ch, pt2_ch, y1_ch, y2_ch, phi1_ch, phi2_ch, j1_ch, j2_ch, pt1, pt2, y1, y2, phi1, phi2, j1, j2));
-        IncPart.clear();
-        ChargedPart.clear();*/
+
+	mytxtfile << evid << ", " << rhoA_threshold << ", " << i << ", " << jets[i].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().b() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pt1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pt2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().j1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().j2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pt1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pt2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().j1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().j2() << ", " << jets.size() << ", " << jets[i].perp() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << jets[i].constituents().size() << ", " << IncPart.size() << endl;
+	
+	IncPart.clear();
+        ChargedPart.clear();
         IncPart_unsort.clear();
         ChargedPart_unsort.clear();
-      }
 
-      //mytxtfile << evid << ", " << rhoA_threshold << ", " << i << ", " << jets[i].user_info<fastjet::DihadronInfo>().b_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().b() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pt1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pt2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().j1_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().j2_ch() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pt1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().pt2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().y2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().phi2() << ", " << jets[i].user_info<fastjet::DihadronInfo>().j1() << ", " << jets[i].user_info<fastjet::DihadronInfo>().j2() << ", " << jets.size() << ", " << jets[i].perp() << ", " << jets[i].eta() << ", " << jets[i].phi() << ", " << jets[i].constituents().size() << ", " << endl;
-
-    } // event loop ends
+      } // jet loop ends
+   } // event loop ends
 
     /// Normalise histograms etc., after the run
     void finalize()
