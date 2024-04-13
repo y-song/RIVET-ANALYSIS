@@ -205,28 +205,28 @@ namespace Rivet
 
           std::random_device rd;
           std::default_random_engine generator(rd());
-          //double rad, angle;
-          vector<double> direction = get_direction(jets[i].px(), jets[i].py(), jets[i].pz());
+          double rad, angle;
+          /*vector<double> direction = get_direction(jets[i].px(), jets[i].py(), jets[i].pz());
           double x_comp = direction.at(0);
           double y_comp = direction.at(1);
           double z_comp = direction.at(2);
-          double theta = acos(z_comp);
+          double theta = acos(z_comp);*/
           int charge;
 
           // set kinematics
-          //get_direction_andrew(&rad, &angle);
+          get_direction_andrew(&rad, &angle);
           double mt = random_mt(generator) + 0.2;
-          /*double eta = jets[i].eta() + rad * sin(angle);
+          double pt = sqrt(pow(mt, 2) - 0.13957 * 0.13957);
+          double eta = jets[i].eta() + rad * sin(angle);
           double phi = jets[i].phi() + rad * cos(angle);
           double pz = sinh(eta) * pt;
           double py = sin(phi) * pt;
-          double px = cos(phi) * pt;*/
+          double px = cos(phi) * pt;
 
-          double pt = sqrt(pow(mt, 2) - 0.13957 * 0.13957);
-          double p = pt / sin(theta);
+          /*double p = pt / sin(theta);
           double px = p * x_comp;
           double py = p * y_comp;
-          double pz = p * z_comp;
+          double pz = p * z_comp;*/
           double E = sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2) + 0.13957 * 0.13957);
 
           fastjet::PseudoJet pseudojet(px, py, pz, E);
