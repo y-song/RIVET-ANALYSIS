@@ -295,6 +295,8 @@ namespace Rivet
           y2 = (IncPart.at(1)).rap();
           phi1 = (IncPart.at(0)).phi();
           phi2 = (IncPart.at(1)).phi();
+          j1 = (IncPart.at(0)).user_info<fastjet::ParticleInfo>().j();
+          j2 = (IncPart.at(1)).user_info<fastjet::ParticleInfo>().j();
         }
 
         if (ChargedPart.size() < 2)
@@ -310,12 +312,14 @@ namespace Rivet
         else
         {
           b_ch = (ChargedPart.at(0)).user_info<fastjet::ParticleInfo>().charge() * (ChargedPart.at(1)).user_info<fastjet::ParticleInfo>().charge();
-          pt1 = (ChargedPart.at(0)).pt();
-          pt2 = (ChargedPart.at(1)).pt();
+          pt1_ch = (ChargedPart.at(0)).pt();
+          pt2_ch = (ChargedPart.at(1)).pt();
           y1_ch = (ChargedPart.at(0)).rap();
           y2_ch = (ChargedPart.at(1)).rap();
           phi1_ch = (ChargedPart.at(0)).phi();
           phi2_ch = (ChargedPart.at(1)).phi();
+          j1_ch = (ChargedPart.at(0)).user_info<fastjet::ParticleInfo>().j();
+          j2_ch = (ChargedPart.at(1)).user_info<fastjet::ParticleInfo>().j();
         }
         jets[i].set_user_info(new fastjet::DihadronInfo(b_ch, b, pt1_ch, pt2_ch, y1_ch, y2_ch, phi1_ch, phi2_ch, j1_ch, j2_ch, pt1, pt2, y1, y2, phi1, phi2, j1, j2));
 
