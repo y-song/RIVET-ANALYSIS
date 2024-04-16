@@ -13,6 +13,7 @@
 #include "vector"
 #include "stdio.h"
 #include "stdlib.h"
+#include "ctime"
 
 using namespace std;
 
@@ -21,21 +22,21 @@ namespace fastjet
   class ParticleInfo : public PseudoJet::UserInfoBase
   {
   public:
-    ParticleInfo(const double &charge, const int &j) : _charge(charge), _j(j) {}
-    double charge() const { return _charge; }
+    ParticleInfo(const int &charge, const int &j) : _charge(charge), _j(j) {}
+    int charge() const { return _charge; }
     int j() const { return _j; }
 
   protected:
-    double _charge;
+    int _charge;
     int _j; // 1 if particle is from jet, 0 if it is from background
   };
 
   class DihadronInfo : public PseudoJet::UserInfoBase
   {
   public:
-    DihadronInfo(const double &b_ch, const double &b, const double &pt1_ch, const double &pt2_ch, const double &y1_ch, const double &y2_ch, const double &phi1_ch, const double &phi2_ch, const int &j1_ch, const int &j2_ch, const double &pt1, const double &pt2, const double &y1, const double &y2, const double &phi1, const double &phi2, const int &j1, const int &j2) : _b_ch(b_ch), _b(b), _pt1_ch(pt1_ch), _pt2_ch(pt2_ch), _y1_ch(y1_ch), _y2_ch(y2_ch), _phi1_ch(phi1_ch), _phi2_ch(phi2_ch), _j1_ch(j1_ch), _j2_ch(j2_ch), _pt1(pt1), _pt2(pt2), _y1(y1), _y2(y2), _phi1(phi1), _phi2(phi2), _j1(j1), _j2(j2) {}
-    double b_ch() const { return _b_ch; }
-    double b() const { return _b; }
+    DihadronInfo(const int &b_ch, const int &b, const double &pt1_ch, const double &pt2_ch, const double &y1_ch, const double &y2_ch, const double &phi1_ch, const double &phi2_ch, const int &j1_ch, const int &j2_ch, const double &pt1, const double &pt2, const double &y1, const double &y2, const double &phi1, const double &phi2, const int &j1, const int &j2) : _b_ch(b_ch), _b(b), _pt1_ch(pt1_ch), _pt2_ch(pt2_ch), _y1_ch(y1_ch), _y2_ch(y2_ch), _phi1_ch(phi1_ch), _phi2_ch(phi2_ch), _j1_ch(j1_ch), _j2_ch(j2_ch), _pt1(pt1), _pt2(pt2), _y1(y1), _y2(y2), _phi1(phi1), _phi2(phi2), _j1(j1), _j2(j2) {}
+    int b_ch() const { return _b_ch; }
+    int b() const { return _b; }
     double pt1_ch() const { return _pt1_ch; }
     double pt2_ch() const { return _pt2_ch; }
     double y1_ch() const { return _y1_ch; }
@@ -54,8 +55,8 @@ namespace fastjet
     int j2() const { return _j2; }
 
   protected:
-    double _b_ch;
-    double _b;
+    int _b_ch;
+    int _b;
     double _pt1_ch;
     double _pt2_ch;
     double _y1_ch;
@@ -88,7 +89,7 @@ namespace Rivet
       declare(fs, "fs");
 
       // open output file
-      mytxtfile.open("jet_in_bckgrd_test.txt");
+      mytxtfile.open("jet_in_bckgrd_PTMINpthatPTMAX.txt");
     }
 
     // Function to sample from the distribution x * exp(-6 * x)
@@ -167,7 +168,7 @@ namespace Rivet
         if (p.pid() == 12 || p.pid() == 14 || p.pid() == 16)
           continue;
         PseudoJet pseudojet(p.px(), p.py(), p.pz(), p.E());
-        double charge = p.charge();
+        int charge = p.charge();
         pseudojet.set_user_info(new fastjet::ParticleInfo(charge, 1));
         parts.push_back(pseudojet);
       }
@@ -181,7 +182,8 @@ namespace Rivet
       std::random_device rd;
       std::default_random_engine generator(rd());
       double rhoA_threshold = random_rhoa(generator);
-
+      std::uniform_real_distribution<double> uniformDistribution(0.0, 1.0);
+  
       for (unsigned int i = 0; i < jets.size(); i++)
       {
 
@@ -190,7 +192,7 @@ namespace Rivet
         for (unsigned int j = 0; j < IncPart_unsort.size(); j++)
         {
           PseudoJet part = IncPart_unsort.at(j);
-          double charge = part.user_info<fastjet::ParticleInfo>().charge();
+          int charge = part.user_info<fastjet::ParticleInfo>().charge();
           if (charge != 0)
           {
             // part.set_user_info(new fastjet::ParticleInfo(charge, 1));
@@ -199,14 +201,12 @@ namespace Rivet
         }
 
         double rhoA = 0;
-
+	//srand(time(0));
         while (rhoA < rhoA_threshold)
         {
 
-          std::random_device rd;
-          std::default_random_engine generator(rd());
-          double rad, angle;
-          int charge;
+  	  double rad, angle;
+          int q = -9;
 
           // set kinematics
           get_direction(&rad, &angle);
@@ -222,24 +222,25 @@ namespace Rivet
           fastjet::PseudoJet pseudojet(px, py, pz, E);
 
           // set charge
-          std::uniform_real_distribution<double> uniformDistribution(0.0, 1.0);
-          double random = uniformDistribution(generator);
-          if (random < 1 / 3)
+          double random = uniformDistribution(generator);//(double)rand() / (double)RAND_MAX;
+	  //cout << random << endl;
+	  if (random < 0.333333333333333333)//(double)(1/3))
           {
-            charge = -1;
+            q = -1;
           }
-          else if (random > 1 / 3 && random < 2 / 3)
+          else if (random < 0.66666666666666666666)//(double)(2/3))
           {
-            charge = 0;
+            q = 0;
           }
           else
           {
-            charge = 1;
+            q = 1;
           }
-          pseudojet.set_user_info(new fastjet::ParticleInfo(charge, 0));
-
-          IncPart_unsort.push_back(pseudojet);
-          if (charge != 0)
+ 	  //cout << q << endl;
+          pseudojet.set_user_info(new fastjet::ParticleInfo(q, 0));
+  
+	  IncPart_unsort.push_back(pseudojet);
+          if (q != 0)
           {
             ChargedPart_unsort.push_back(pseudojet);
           }
@@ -257,8 +258,8 @@ namespace Rivet
         vector<fastjet::PseudoJet> IncPart = sorted_by_pt(IncPart_unsort);
         vector<fastjet::PseudoJet> ChargedPart = sorted_by_pt(ChargedPart_unsort);
 
-        double b_ch = 0;
-        double b = 0;
+        int b_ch = -9;
+        int b = -9;
         double pt1_ch = 0;
         double pt2_ch = 0;
         double y1_ch = 0;
