@@ -65,7 +65,7 @@ namespace Rivet
       PseudoJets parts;
       for (const Particle &p : fsParticles)
       {
-        if (p.pid() == 12 || p.pid() == 14 || p.pid() == 16)
+        if ( abs(p.pid()) == 12 || abs(p.pid()) == 14 || abs(p.pid()) == 16)
           continue;
         PseudoJet pseudojet(p.px(), p.py(), p.pz(), p.E());
         double charge = p.charge();
