@@ -51,7 +51,7 @@ namespace Rivet
       const FinalState fs(Cuts::pt > 0.2 && Cuts::pt < 30 && Cuts::abseta < 1.0);
       declare(fs, "fs");
      // open output file
-      mytxtfile.open("pythia_PTMINpthatPTMAX_eta.txt");
+      mytxtfile.open("pythia_PTMINpthatPTMAX_rc_truth.txt");
     }
 
     /// Perform the per-event analysis
@@ -87,6 +87,28 @@ namespace Rivet
       fastjet::ClusterSequence cs(parts, jet_def);
       vector<fastjet::PseudoJet> jets = sorted_by_pt(selector(cs.inclusive_jets()));
       //vector<fastjet::PseudoJet> sdjets = sd(jets);
+      
+      for (unsigned int i = 0; i < jets.size(); i++)
+      {
+	jets[i].set_user_index(0);
+      }
+
+      // match jets to partons
+      for (HepMC::GenEvent::particle_iterator p = theEvent->particles_begin(); p != theEvent->particles_end(); ++p)
+      {
+
+        if ((*p)->status() != 23)
+          continue;
+        PseudoJet parton_pseudojet((*p)->momentum().px(), (*p)->momentum().py(), (*p)->momentum().pz(), (*p)->momentum().e());
+        
+	for (unsigned int i = 0; i < jets.size(); i++)
+        {
+          if (jets[i].delta_R(parton_pseudojet) > 0.4 || jets[i].user_index() != 0)
+            continue;
+          jets[i].set_user_index((*p)->pdg_id());
+          break;
+        }
+      }
 
       for (unsigned int i = 0; i < jets.size(); i++)
       {
@@ -111,8 +133,7 @@ namespace Rivet
         double dr = ChargedParts.at(0).delta_R(ChargedParts.at(1));
 	double m2 = pow(ChargedParts.at(0).e()+ChargedParts.at(1).e(), 2.0) - pow(ChargedParts.at(0).px()+ChargedParts.at(1).px(), 2.0) - pow(ChargedParts.at(0).py()+ChargedParts.at(1).py(), 2.0) - pow(ChargedParts.at(0).pz()+ChargedParts.at(1).pz(), 2.0);
         double m = sqrt(m2);
-	//cout << m << endl;
-
+	
 	int parent1 = -999;
 	int parent2 = -999;
 	Particles parents1 = ChargedParts.at(0).user_info<fastjet::ParticleInfo>().parents();
@@ -121,6 +142,11 @@ namespace Rivet
 	if (parents1.size() > 0)
 	{
 	    parent1 = parents1.at(0).pid();
+	    //if (parent1 == 113)
+	    //{
+	    //	Particle grandparent1 = parents1.at(0).parents().at(0);
+            //    cout << "\nfound a parent of a rho0: " << grandparent1.pid() << endl;
+	    //}	
 	}
 	if (parents2.size() > 0)
 	{
@@ -135,7 +161,7 @@ namespace Rivet
 	        cout << parent1.pid() << ", ";
 	    }
 	}
-	mytxtfile << evid << ", " << xsecweight << ", " << jets[i].perp() << ", " << jets[i].constituents().size() << ", " << ChargedParts.size() << ", " << ChargedParts.at(0).perp() << ", " << ChargedParts.at(0).user_info<fastjet::ParticleInfo>().charge() << ", " << ChargedParts.at(0).eta() << ", " << ChargedParts.at(0).phi() << ", " << ChargedParts.at(0).user_info<fastjet::ParticleInfo>().pid() << ", " << parent1 << ", " << ChargedParts.at(1).perp() << ", " << ChargedParts.at(1).user_info<fastjet::ParticleInfo>().charge() << ", " << ChargedParts.at(1).eta() << ", " << ChargedParts.at(1).phi() << ", " << ChargedParts.at(1).user_info<fastjet::ParticleInfo>().pid() << ", " << parent2 << ", " << dr << ", " << m << "\n";
+	mytxtfile << evid << ", " << xsecweight << ", " << jets[i].perp() << ", " << jets[i].constituents().size() << ", " << jets[i].user_index() << ", " << ChargedParts.size() << ", " << ChargedParts.at(0).perp() << ", " << ChargedParts.at(0).user_info<fastjet::ParticleInfo>().charge() << ", " << ChargedParts.at(0).eta() << ", " << ChargedParts.at(0).phi() << ", " << ChargedParts.at(0).user_info<fastjet::ParticleInfo>().pid() << ", " << parent1 << ", " << ChargedParts.at(1).perp() << ", " << ChargedParts.at(1).user_info<fastjet::ParticleInfo>().charge() << ", " << ChargedParts.at(1).eta() << ", " << ChargedParts.at(1).phi() << ", " << ChargedParts.at(1).user_info<fastjet::ParticleInfo>().pid() << ", " << parent2 << ", " << dr << ", " << m << "\n";
       }
     }
 
